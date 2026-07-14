@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation';
 import { Search, Bell, Moon, Sun } from 'lucide-react';
 import { useTheme } from './theme-provider';
-import { UserButton } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
 import { MobileNav } from './mobile-nav';
 
@@ -77,14 +76,12 @@ export function Header() {
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </button>
 
-        <UserButton
-          afterSignOutUrl="/"
-          appearance={{
-            elements: {
-              avatarBox: 'h-8 w-8',
-            },
-          }}
-        />
+        <button
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium"
+          aria-label="User menu"
+        >
+          U
+        </button>
       </div>
     </header>
   );
