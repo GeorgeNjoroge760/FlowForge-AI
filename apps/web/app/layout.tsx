@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { ApiProvider } from '@/components/auth/api-provider';
 import { headers } from 'next/headers';
@@ -17,14 +18,16 @@ export default async function RootLayout({
   await headers();
 
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen antialiased">
-        <ApiProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </ApiProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className="min-h-screen antialiased">
+          <ApiProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </ApiProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
