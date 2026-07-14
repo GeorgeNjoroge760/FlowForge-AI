@@ -205,9 +205,9 @@ export function NodeConfigPanel() {
     if (!typeInfo) return [];
     const schema = typeInfo.configSchema as Record<string, ConfigField>;
     return Object.entries(schema).map(([key, val]) => ({
+      ...val,
       key,
       label: key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-      ...val,
     }));
   }, [typeInfo]);
 

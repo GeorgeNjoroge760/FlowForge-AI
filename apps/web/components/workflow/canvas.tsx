@@ -29,8 +29,8 @@ function CanvasInner() {
       onNodesChange(changes);
 
       const selectChange = changes.find(
-        (c) => c.type === 'select' && c.selected
-      );
+        (c) => c.type === 'select' && c.selected && 'id' in c
+      ) as { type: 'select'; id: string } | undefined;
       if (selectChange) {
         selectNode(selectChange.id);
         setConfigPanelOpen(true);

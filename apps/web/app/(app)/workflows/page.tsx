@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { api } from '@/lib/api';
 import { formatRelativeTime } from '@/lib/utils';
-import type { Workflow, PaginatedResponse } from '@/types';
+import type { Workflow as WorkflowType, PaginatedResponse } from '@/types';
 import {
   Plus,
   Search,
@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function WorkflowsPage() {
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -43,7 +43,7 @@ export default function WorkflowsPage() {
   async function loadWorkflows() {
     setLoading(true);
     try {
-      const data: PaginatedResponse<Workflow> = await api.getWorkflows({
+      const data: PaginatedResponse<WorkflowType> = await api.getWorkflows({
         page,
         limit: 20,
         search: search || undefined,
@@ -76,7 +76,7 @@ export default function WorkflowsPage() {
     }
   }
 
-  async function handleToggleStatus(workflow: Workflow) {
+  async function handleToggleStatus(workflow: WorkflowType) {
     try {
       await api.updateWorkflow(workflow.id, {
         status: workflow.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE',
