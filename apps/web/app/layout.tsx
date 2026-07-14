@@ -6,7 +6,7 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'FlowForge AI - Workflow Automation Platform',
-  description: 'Build powerful workflows with natural language. Automate anything with AI.',
+  description: 'Build powerful AI-driven workflows. Automate anything.',
 };
 
 export default async function RootLayout({
