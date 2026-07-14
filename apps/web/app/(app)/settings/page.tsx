@@ -65,7 +65,7 @@ export default function SettingsPage() {
 
   const loadApiKeys = async () => {
     try {
-      const keys = await api.request('/api/v1/api-keys');
+      const keys = await api.request<any[]>('/api/v1/api-keys');
       setApiKeys(keys || []);
     } catch (error) {
       console.error('Failed to load API keys:', error);
@@ -93,7 +93,7 @@ export default function SettingsPage() {
     if (!newKeyName.trim()) return;
     setCreatingKey(true);
     try {
-      const response = await api.request('/api/v1/api-keys', {
+      const response = await api.request<any>('/api/v1/api-keys', {
         method: 'POST',
         body: { name: newKeyName },
       });
