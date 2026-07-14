@@ -35,6 +35,7 @@
     "tailwind-merge": "^2.5.0",
     "tailwindcss-animate": "^1.0.7",
     "shared": "*",
+    "stripe": "^17.4.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
