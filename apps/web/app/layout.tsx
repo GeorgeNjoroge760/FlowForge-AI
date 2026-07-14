@@ -17,8 +17,24 @@ export default async function RootLayout({
 }) {
   await headers();
 
+  const key = (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '').trim();
+
+  if (!key || key.length < 10) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body className="min-h-screen antialiased">
+          <ApiProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </ApiProvider>
+        </body>
+      </html>
+    );
+  }
+
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={key}>
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen antialiased">
           <ApiProvider>
