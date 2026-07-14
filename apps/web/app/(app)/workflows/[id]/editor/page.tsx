@@ -104,7 +104,7 @@ export default function WorkflowEditorPage() {
         animated: true,
       }));
 
-      loadWorkflow(wfNodes, wfEdges);
+      loadWorkflow(wfNodes as any, wfEdges);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load workflow');
     } finally {
