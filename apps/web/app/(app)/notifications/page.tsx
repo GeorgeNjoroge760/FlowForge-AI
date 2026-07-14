@@ -40,8 +40,8 @@ export default function NotificationsPage() {
 
   const loadNotifications = async () => {
     try {
-      const data = await api.request('/api/v1/notifications');
-      setNotifications(data || []);
+      const data = await api.request<any>('/api/v1/notifications');
+      setNotifications(data?.data || data || []);
     } catch (error) {
       console.error('Failed to load notifications:', error);
     } finally {
