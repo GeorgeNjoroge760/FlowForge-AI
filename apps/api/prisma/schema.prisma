@@ -1,0 +1,321 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships  Membership[]
+  apiKeys      ApiKey[]
+  notifications Notification[]
+  auditLogs    AuditLog[]
+}
+
+model Organization {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  logoUrl String?
+  plan    String @default("FREE")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships   Membership[]
+  workflows     Workflow[]
+  templates     Template[]
+  subscriptions Subscription[]
+  usageRecords  Usage[]
+  apiKeys       ApiKey[]
+  integrations  Integration[]
+}
+
+model Membership {
+  id             String @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String @default("MEMBER")
+
+  createdAt DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model Workflow {
+  id             String @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  status         String @default("INACTIVE")
+  definition     String @default("{}")
+  version        Int    @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nodes        WorkflowNode[]
+  edges        WorkflowEdge[]
+  executions   Execution[]
+  templateRefs Template[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, status])
+}
+
+model WorkflowNode {
+  id         String   @id @default(cuid())
+  workflowId String
+  type       String
+  category   String
+  label      String
+  positionX  Float    @default(0)
+  positionY  Float    @default(0)
+  config     String   @default("{}")
+  width      Float?
+  height     Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  sourceEdges WorkflowEdge[] @relation("SourceNode")
+  targetEdges WorkflowEdge[] @relation("TargetNode")
+
+  @@index([workflowId])
+}
+
+model WorkflowEdge {
+  id             String  @id @default(cuid())
+  workflowId     String
+  sourceNodeId   String
+  targetNodeId   String
+  sourceHandleId String?
+  targetHandleId String?
+  label          String?
+  condition      String?
+
+  createdAt DateTime @default(now())
+
+  workflow   Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  sourceNode WorkflowNode @relation("SourceNode", fields: [sourceNodeId], references: [id])
+  targetNode WorkflowNode @relation("TargetNode", fields: [targetNodeId], references: [id])
+
+  @@index([workflowId])
+  @@index([sourceNodeId])
+  @@index([targetNodeId])
+}
+
+model Execution {
+  id          String @id @default(cuid())
+  workflowId  String
+  status      String @default("PENDING")
+  triggerType String?
+  input       String?
+  output      String?
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  duration    Int?
+  creditsUsed Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  workflow Workflow         @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  logs     ExecutionLog[]
+
+  @@index([workflowId, createdAt])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ExecutionLog {
+  id          String   @id @default(cuid())
+  executionId String
+  nodeId      String
+  nodeType    String
+  nodeLabel   String
+  status      String
+  input       String?
+  output      String?
+  error       String?
+  duration    Int?
+  retryCount  Int      @default(0)
+
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  execution Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
+  @@index([executionId])
+  @@index([nodeId])
+}
+
+model Integration {
+  id             String @id @default(cuid())
+  organizationId String
+  provider       String
+  displayName    String
+  status         String @default("connected")
+  metadata       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  oauthTokens  OAuthToken[]
+
+  @@unique([organizationId, provider])
+  @@index([organizationId])
+}
+
+model OAuthToken {
+  id            String    @id @default(cuid())
+  integrationId String
+  accessToken   String
+  refreshToken  String?
+  expiresAt     DateTime?
+  scope         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId])
+}
+
+model Template {
+  id             String  @id @default(cuid())
+  organizationId String?
+  name           String
+  description    String
+  category       String
+  definition     String
+  icon           String?
+  isPublic       Boolean @default(false)
+  rating         Float   @default(0)
+  usageCount     Int     @default(0)
+  authorId       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  workflows    Workflow[]
+
+  @@index([isPublic, category])
+  @@index([rating])
+}
+
+model Subscription {
+  id                   String @id @default(cuid())
+  organizationId       String
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  plan                 String @default("FREE")
+  status               String @default("active")
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId])
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+}
+
+model Usage {
+  id             String @id @default(cuid())
+  organizationId String
+  period         String
+  executions     Int    @default(0)
+  aiTokens       Int    @default(0)
+  apiCalls       Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, period])
+  @@index([organizationId])
+}
+
+model ApiKey {
+  id             String    @id @default(cuid())
+  userId         String
+  organizationId String?
+  name           String
+  keyHash        String    @unique
+  keyPrefix      String
+  permissions    String?
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+
+  createdAt DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([keyHash])
+  @@index([userId])
+}
+
+model Notification {
+  id        String @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  read      Boolean @default(false)
+  metadata  String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String @id @default(cuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  metadata   String?
+  ipAddress  String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([resource, resourceId])
+}
