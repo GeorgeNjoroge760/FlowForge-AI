@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { ApiProvider } from '@/components/auth/api-provider';
+import { ClerkWrapper } from './clerk-wrapper';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -14,27 +14,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  const content = (
+  return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen antialiased">
-        <ApiProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </ApiProvider>
+        <ClerkWrapper>
+          <ApiProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </ApiProvider>
+        </ClerkWrapper>
       </body>
     </html>
-  );
-
-  if (!publishableKey) {
-    return content;
-  }
-
-  return (
-    <ClerkProvider publishableKey={publishableKey}>
-      {content}
-    </ClerkProvider>
   );
 }
