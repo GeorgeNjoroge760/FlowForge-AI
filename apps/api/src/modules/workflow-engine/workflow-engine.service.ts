@@ -60,7 +60,7 @@ export class WorkflowEngineService {
         workflow.nodes.map((n) => ({
           id: n.id,
           category: n.category,
-          config: (JSON.parse(n.config || '{}') as Record<string, unknown>),
+          config: (n.config as Record<string, unknown>) || {},
           type: n.type,
           label: n.label,
         })),
@@ -70,7 +70,7 @@ export class WorkflowEngineService {
           target: e.targetNodeId,
           sourceHandle: e.sourceHandleId || undefined,
           targetHandle: e.targetHandleId || undefined,
-          condition: (e.condition ? JSON.parse(e.condition) : undefined) as Record<string, unknown> | undefined,
+          condition: (e.condition as Record<string, unknown>) || undefined,
         })),
       );
 
@@ -103,7 +103,7 @@ export class WorkflowEngineService {
               nodeType: node.type,
               category: node.category,
               label: node.label,
-              config: (JSON.parse(node.config || '{}') as Record<string, any>),
+              config: ((node.config as Record<string, any>) || {}),
               previousOutputs,
               triggerData: options.input || {},
               executionId: execution.id,

@@ -145,7 +145,7 @@ async function main() {
       await prisma.template.create({
         data: {
           ...template,
-          definition: JSON.stringify(template.definition),
+          definition: template.definition,
         },
       });
       console.log(`Created template: ${template.name}`);

@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -88,7 +89,7 @@ export class ExecutionsService {
         workflowId,
         status: 'PENDING',
         triggerType: data.triggerType || 'manual',
-        input: data.input ? JSON.stringify(data.input) : '{}',
+        input: (data.input || {}) as Prisma.InputJsonValue,
       },
     });
   }
@@ -109,7 +110,7 @@ export class ExecutionsService {
       updateData.completedAt = new Date();
     }
 
-    if (data?.output !== undefined) updateData.output = JSON.stringify(data.output);
+    if (data?.output !== undefined) updateData.output = data.output as Prisma.InputJsonValue;
     if (data?.error !== undefined) updateData.error = data.error;
     if (data?.duration !== undefined) updateData.duration = data.duration;
     if (data?.creditsUsed !== undefined) updateData.creditsUsed = data.creditsUsed;
@@ -138,8 +139,8 @@ export class ExecutionsService {
         nodeType: data.nodeType,
         nodeLabel: data.nodeLabel,
         status: data.status,
-        input: data.input ? JSON.stringify(data.input) : null,
-        output: data.output ? JSON.stringify(data.output) : null,
+        input: (data.input as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        output: (data.output as Prisma.InputJsonValue) ?? Prisma.DbNull,
         error: data.error || null,
         duration: data.duration || null,
         retryCount: data.retryCount || 0,
@@ -156,7 +157,7 @@ export class ExecutionsService {
 
     return this.create(execution.workflowId, {
       triggerType: 'retry',
-      input: execution.input ? JSON.parse(execution.input) : undefined,
+      input: execution.input as Record<string, unknown> | undefined,
     });
   }
 

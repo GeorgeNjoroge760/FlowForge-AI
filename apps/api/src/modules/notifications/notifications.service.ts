@@ -82,7 +82,7 @@ export class NotificationsService {
         type: data.type,
         title: data.title,
         message: data.message,
-        metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+        metadata: data.metadata || null,
       },
     });
   }

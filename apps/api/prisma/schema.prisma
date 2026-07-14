@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -65,7 +65,7 @@ model Workflow {
   name           String
   description    String?
   status         String @default("INACTIVE")
-  definition     String @default("{}")
+  definition     Json   @default("{}")
   version        Int    @default(1)
 
   createdAt DateTime @default(now())
@@ -89,7 +89,7 @@ model WorkflowNode {
   label      String
   positionX  Float    @default(0)
   positionY  Float    @default(0)
-  config     String   @default("{}")
+  config     Json     @default("{}")
   width      Float?
   height     Float?
 
@@ -112,7 +112,7 @@ model WorkflowEdge {
   sourceHandleId String?
   targetHandleId String?
   label          String?
-  condition      String?
+  condition      Json?
 
   createdAt DateTime @default(now())
 
@@ -130,8 +130,8 @@ model Execution {
   workflowId  String
   status      String @default("PENDING")
   triggerType String?
-  input       String?
-  output      String?
+  input       Json?
+  output      Json?
   error       String?
   startedAt   DateTime?
   completedAt DateTime?
@@ -155,8 +155,8 @@ model ExecutionLog {
   nodeType    String
   nodeLabel   String
   status      String
-  input       String?
-  output      String?
+  input       Json?
+  output      Json?
   error       String?
   duration    Int?
   retryCount  Int      @default(0)
@@ -176,7 +176,7 @@ model Integration {
   provider       String
   displayName    String
   status         String @default("connected")
-  metadata       String?
+  metadata       Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -210,7 +210,7 @@ model Template {
   name           String
   description    String
   category       String
-  definition     String
+  definition     Json
   icon           String?
   isPublic       Boolean @default(false)
   rating         Float   @default(0)
@@ -273,7 +273,7 @@ model ApiKey {
   name           String
   keyHash        String    @unique
   keyPrefix      String
-  permissions    String?
+  permissions    Json?
   lastUsedAt     DateTime?
   expiresAt      DateTime?
 
@@ -287,13 +287,13 @@ model ApiKey {
 }
 
 model Notification {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
   type      String
   title     String
   message   String
   read      Boolean @default(false)
-  metadata  String?
+  metadata  Json?
 
   createdAt DateTime @default(now())
 
@@ -309,7 +309,7 @@ model AuditLog {
   action     String
   resource   String
   resourceId String?
-  metadata   String?
+  metadata   Json?
   ipAddress  String?
 
   createdAt DateTime @default(now())

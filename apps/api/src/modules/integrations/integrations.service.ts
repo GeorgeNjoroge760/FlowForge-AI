@@ -44,7 +44,7 @@ export class IntegrationsService {
         where: { id: existing.id },
         data: {
           displayName: data.displayName,
-          metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+          metadata: data.metadata || null,
           status: 'connected',
         },
       });
@@ -55,7 +55,7 @@ export class IntegrationsService {
         organizationId,
         provider: data.provider,
         displayName: data.displayName,
-        metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+        metadata: data.metadata || null,
         status: 'connected',
       },
     });

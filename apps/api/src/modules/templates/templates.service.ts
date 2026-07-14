@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -98,7 +99,7 @@ export class TemplatesService {
         name: data.name,
         description: data.description ?? '',
         category: data.category ?? 'general',
-        definition: data.definition ? JSON.stringify(data.definition) : '{}',
+        definition: data.definition || {},
         isPublic: data.isPublic ?? false,
       },
     });
@@ -121,7 +122,7 @@ export class TemplatesService {
 
     const updateData: any = { ...data };
     if (data.definition !== undefined) {
-      updateData.definition = JSON.stringify(data.definition);
+      updateData.definition = data.definition;
     }
 
     return this.prisma.template.update({
@@ -158,7 +159,7 @@ export class TemplatesService {
         name: `${existing.name} (Copy)`,
         description: existing.description,
         category: existing.category,
-        definition: existing.definition,
+        definition: (existing.definition as Prisma.InputJsonValue) ?? {},
         isPublic: false,
       },
     });
