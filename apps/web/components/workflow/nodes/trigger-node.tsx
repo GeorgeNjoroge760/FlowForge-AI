@@ -59,7 +59,7 @@ function TriggerNodeComponent({ data, selected }: NodeProps & { data: WorkflowNo
         </div>
       </div>
 
-      {(data.config as Record<string, unknown>)?.status && (
+      {!!(data.config as Record<string, unknown>)?.status && (
         <div className="mt-2 flex items-center gap-1.5">
           <span
             className={cn(
@@ -68,7 +68,7 @@ function TriggerNodeComponent({ data, selected }: NodeProps & { data: WorkflowNo
             )}
           />
           <span className="text-xs text-muted-foreground capitalize">
-            {String(data.config.status)}
+            {String((data.config as Record<string, unknown>).status)}
           </span>
         </div>
       )}
