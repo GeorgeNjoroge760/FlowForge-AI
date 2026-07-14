@@ -34,7 +34,7 @@
     "recharts": "^2.13.0",
     "tailwind-merge": "^2.5.0",
     "tailwindcss-animate": "^1.0.7",
-    "shared": "workspace:*",
+    "shared": "*",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
